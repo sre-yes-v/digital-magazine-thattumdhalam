@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 const pages = Array.from({ length: 30 }, (_, index) => ({
   id: index + 1,
@@ -309,8 +310,8 @@ export default function MagazinePreview() {
             See the complete issue and discover every story.
           </p>
 
-          <button
-            type="button"
+          <Link
+            href="/magazine/latest"
             className="
               inline-flex
               items-center
@@ -330,7 +331,7 @@ export default function MagazinePreview() {
           >
             Read the Full Magazine
             <ChevronRight size={18} />
-          </button>
+          </Link>
 
         </div>
 
