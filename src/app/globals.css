@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brick: #D11001;
+  --lemon: #EAEC02;
+  --smoke: #F6F5F4;
+  --garnet: #661B0B;
+  --coffee: #20150A;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--smoke);
+  color: var(--coffee);
+  font-family:
+    Arial,
+    "Noto Sans Malayalam",
+    sans-serif;
+}
+
+::selection {
+  background: var(--lemon);
+  color: var(--coffee);
+}
+
+/* Hero grid */
+
+.hero-grid {
+  background-image:
+    linear-gradient(
+      rgba(246, 245, 244, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(246, 245, 244, 0.12) 1px,
+      transparent 1px
+    );
+
+  background-size: 60px 60px;
+}
+
+/* Magazine floating animation */
+
+@keyframes magazineFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(1deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+}
+
+.animate-magazine {
+  animation: magazineFloat 6s ease-in-out infinite;
+}
+
+/* Loader */
+
+@keyframes loaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-spin {
+  animation: loaderSpin 0.8s linear infinite;
+}
+
+/* Shimmer */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.6s infinite;
 }
