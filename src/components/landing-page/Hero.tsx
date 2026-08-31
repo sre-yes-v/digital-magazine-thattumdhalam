@@ -156,7 +156,7 @@ export default function Hero() {
   <div className="relative overflow-hidden rounded-[20px]">
 
     <Image
-      src="/magazine/cover.png"
+      src="/magazine/cover.jpeg"
       alt="തട്ടുംതളം ഡിജിറ്റൽ മാഗസിൻ"
       width={900}
       height={1200}
