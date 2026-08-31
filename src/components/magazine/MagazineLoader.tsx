@@ -10,7 +10,7 @@ export default function MagazineLoader() {
         <div className="relative h-24 w-24 sm:h-28 sm:w-28">
           <Image
             src="/images/logo.jpeg"
-            alt="തട്ടുംതളം"
+            alt="തട്ടുംദളം"
             fill
             priority
             className="object-contain"

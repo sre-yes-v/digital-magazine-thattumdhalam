@@ -157,7 +157,7 @@ export default function Hero() {
 
     <Image
       src="/magazine/cover.jpeg"
-      alt="തട്ടുംതളം ഡിജിറ്റൽ മാഗസിൻ"
+      alt="തട്ടുംദളം ഡിജിറ്റൽ മാഗസിൻ"
       width={900}
       height={1200}
       priority
@@ -183,7 +183,7 @@ export default function Hero() {
         </p>
 
         <p className="mt-2 text-xl font-black text-white sm:text-2xl">
-          തട്ടുംതളം
+          തട്ടുംദളം
         </p>
 
         <p className="mt-1 text-xs text-white/60">

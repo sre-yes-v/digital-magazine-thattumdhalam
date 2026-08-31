@@ -60,6 +60,13 @@ export default function Header() {
               </Link>
 
               <Link
+                href="#preview"
+                className="text-sm text-[#F6F5F4]/70 transition hover:text-[#EAEC02]"
+              >
+                Magazine Preview
+              </Link>
+
+              <Link
                 href="#editorial"
                 className="text-sm text-[#F6F5F4]/70 transition hover:text-[#EAEC02]"
               >
