@@ -1,5 +1,12 @@
+import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 import MagazineReader from "@/components/magazine/MagazineReader";
 
-export default function MagazinePage() {
+export default async function MagazinePage() {
+  const user = await requireAuth();
+
+  if (!user) {
+    redirect("/login");
+  }
   return <MagazineReader />;
 }
