@@ -92,7 +92,7 @@ export default function Footer() {
             </h3>
 
             <p className="mt-4 max-w-sm text-sm leading-7 text-white/40">
-              ഏറ്റവും പുതിയ ലക്കം ₹49 ന്
+              ഏറ്റവും പുതിയ ലക്കം ₹100 ന്
               ഡിജിറ്റലായി വായിക്കാം.
             </p>
 
@@ -100,7 +100,7 @@ export default function Footer() {
               href="/magazine/latest"
               className="mt-5 inline-flex rounded-full bg-[#EAEC02] px-5 py-3 text-xs font-black text-[#20150A] transition hover:scale-105"
             >
-              Read Magazine · ₹49
+              Read Magazine · ₹100
             </Link>
 
           </div>

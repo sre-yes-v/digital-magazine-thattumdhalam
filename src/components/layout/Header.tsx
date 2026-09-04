@@ -84,7 +84,7 @@ export default function Header() {
                 href="/magazine/latest"
                 className="rounded-full bg-[#EAEC02] px-5 py-2.5 text-sm font-bold text-[#20150A] transition duration-300 hover:scale-105"
               >
-                Read ₹49
+                Read ₹100
               </Link>
             </div>
 
@@ -147,7 +147,7 @@ export default function Header() {
                   onClick={closeMenu}
                   className="mt-2 rounded-xl bg-[#EAEC02] px-4 py-3 text-center text-sm font-black text-[#20150A]"
                 >
-                  Read Magazine · ₹49
+                  Read Magazine · ₹100
                 </Link>
 
               </div>

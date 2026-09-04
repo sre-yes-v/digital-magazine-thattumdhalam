@@ -75,7 +75,7 @@ export default function Hero() {
               >
                 <BookOpen size={17} />
 
-                വായിക്കാം · ₹49
+                വായിക്കാം · ₹100
 
                 <ArrowUpRight
                   size={16}
@@ -97,7 +97,7 @@ export default function Hero() {
 
               <div>
                 <p className="text-xl font-black sm:text-2xl">
-                  ₹49
+                  ₹100
                 </p>
 
                 <p className="mt-1 text-[10px] text-white/40 sm:text-xs">
@@ -140,7 +140,7 @@ export default function Hero() {
                 >
                   <BookOpen size={17} />
 
-                  Read for just ₹49
+                  Read for just ₹100
 
                   <ArrowUpRight
                     size={17}

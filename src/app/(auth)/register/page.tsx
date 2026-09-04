@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { normalizeIndianPhone } from "@/lib/phone";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -11,24 +12,60 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleRegister(e: FormEvent<HTMLFormElement>) {
+  function handlePhoneChange(value: string) {
+    // Allow the user to type naturally.
+    // Normalize what is displayed.
+    const normalized = normalizeIndianPhone(value);
+
+    if (normalized) {
+      setPhone(normalized);
+      return;
+    }
+
+    // While the user is still typing, keep only
+    // characters that make sense for a phone number.
+    const cleaned = value.replace(/[^\d+ ]/g, "");
+
+    setPhone(cleaned);
+  }
+
+  async function handleRegister(
+    e: FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
     setError("");
 
+    const normalizedPhone = normalizeIndianPhone(phone);
+
+    if (!normalizedPhone) {
+      setError("ദയവായി സാധുവായ ഫോൺ നമ്പർ നൽകുക.");
+      return;
+    }
+
     if (password.length < 8) {
-      setError("പാസ്‌വേഡ് കുറഞ്ഞത് 8 അക്ഷരങ്ങൾ ഉണ്ടായിരിക്കണം.");
+      setError(
+        "പാസ്‌വേഡ് കുറഞ്ഞത് 8 അക്ഷരങ്ങൾ ഉണ്ടായിരിക്കണം."
+      );
+      return;
+    }
+
+    if (password.length > 128) {
+      setError("പാസ്‌വേഡ് വളരെ നീളമുള്ളതാണ്.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("പാസ്‌വേഡുകൾ തമ്മിൽ പൊരുത്തപ്പെടുന്നില്ല.");
+      setError(
+        "പാസ്‌വേഡുകൾ തമ്മിൽ പൊരുത്തപ്പെടുന്നില്ല."
+      );
       return;
     }
 
@@ -41,7 +78,7 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          phone,
+          phone: normalizedPhone,
           password,
         }),
       });
@@ -49,14 +86,17 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Registration failed");
+        setError(
+          data.message ||
+            "Registration failed. Please try again."
+        );
         return;
       }
 
       router.push("/login?registered=true");
     } catch {
       setError(
-        "Unable to connect to the server. Please try again."
+        "സെർവറുമായി ബന്ധപ്പെടാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക."
       );
     } finally {
       setLoading(false);
@@ -86,9 +126,12 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Form */}
+        {/* Form Card */}
         <div className="rounded-2xl border border-[#661B0B]/10 bg-white p-6 shadow-sm sm:p-8">
-          <form onSubmit={handleRegister} className="space-y-5">
+          <form
+            onSubmit={handleRegister}
+            className="space-y-5"
+          >
 
             {/* Phone */}
             <div>
@@ -106,8 +149,11 @@ export default function RegisterPage() {
                 autoComplete="tel"
                 placeholder="+91 9876543210"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) =>
+                  handlePhoneChange(e.target.value)
+                }
                 required
+                maxLength={15}
                 className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
               />
 
@@ -117,75 +163,132 @@ export default function RegisterPage() {
             </div>
 
             {/* Password */}
-            <div className="relative">
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-medium"
+              >
+                പാസ്‌വേഡ്
+              </label>
+
+              <div className="relative">
                 <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder="കുറഞ്ഞത് 8 അക്ഷരങ്ങൾ"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
+                  id="password"
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
+                  autoComplete="new-password"
+                  placeholder="കുറഞ്ഞത് 8 അക്ഷരങ്ങൾ"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                  required
+                  minLength={8}
+                  maxLength={128}
+                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
                 />
 
                 <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 hover:text-[#D11001]"
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((prev) => !prev)
+                  }
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001]"
                 >
-                    {showPassword ? (
-                    <EyeOff size={19} strokeWidth={1.8} />
-                    ) : (
-                    <Eye size={19} strokeWidth={1.8} />
-                    )}
+                  {showPassword ? (
+                    <EyeOff
+                      size={19}
+                      strokeWidth={1.8}
+                    />
+                  ) : (
+                    <Eye
+                      size={19}
+                      strokeWidth={1.8}
+                    />
+                  )}
                 </button>
+              </div>
             </div>
 
-            {/* Confirm password */}
-            <div className="relative">
+            {/* Confirm Password */}
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-2 block text-sm font-medium"
+              >
+                പാസ്‌വേഡ് വീണ്ടും നൽകുക
+              </label>
+
+              <div className="relative">
                 <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder="പാസ്‌വേഡ് വീണ്ടും നൽകുക"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
+                  id="confirmPassword"
+                  type={
+                    showConfirmPassword
+                      ? "text"
+                      : "password"
+                  }
+                  autoComplete="new-password"
+                  placeholder="പാസ്‌വേഡ് വീണ്ടും നൽകുക"
+                  value={confirmPassword}
+                  onChange={(e) =>
+                    setConfirmPassword(
+                      e.target.value
+                    )
+                  }
+                  required
+                  minLength={8}
+                  maxLength={128}
+                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
                 />
 
                 <button
-                    type="button"
-                    onClick={() =>
-                    setShowConfirmPassword((prev) => !prev)
-                    }
-                    aria-label={
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(
+                      (prev) => !prev
+                    )
+                  }
+                  aria-label={
                     showConfirmPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 hover:text-[#D11001]"
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001]"
                 >
-                    {showConfirmPassword ? (
-                    <EyeOff size={19} strokeWidth={1.8} />
-                    ) : (
-                    <Eye size={19} strokeWidth={1.8} />
-                    )}
+                  {showConfirmPassword ? (
+                    <EyeOff
+                      size={19}
+                      strokeWidth={1.8}
+                    />
+                  ) : (
+                    <Eye
+                      size={19}
+                      strokeWidth={1.8}
+                    />
+                  )}
                 </button>
+              </div>
             </div>
 
             {/* Error */}
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div
+                role="alert"
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
                 {error}
               </div>
             )}
 
-            {/* Register */}
+            {/* Register Button */}
             <button
               type="submit"
               disabled={loading}

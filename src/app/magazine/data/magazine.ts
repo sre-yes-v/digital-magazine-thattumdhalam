@@ -15,7 +15,7 @@ export const magazine: Magazine = {
 
   subtitle: "ഡിജിറ്റൽ മാഗസിൻ",
 
-  price: 49,
+  price: 100,
 
   cover: "/images/magazine/cover.jpg",
 
