@@ -3,11 +3,19 @@
 import { FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+
 import { normalizeIndianPhone } from "@/lib/phone";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const redirectUrl =
+    searchParams.get("redirect") || "/";
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -23,19 +31,13 @@ export default function LoginPage() {
 
     setError("");
 
-    /*
-     * Normalize the phone number only when submitting.
-     *
-     * Examples:
-     * 9876543210       -> +919876543210
-     * +91 9876543210   -> +919876543210
-     * 919876543210     -> +919876543210
-     * +919876543210    -> +919876543210
-     */
-    const normalizedPhone = normalizeIndianPhone(phone);
+    const normalizedPhone =
+      normalizeIndianPhone(phone);
 
     if (!normalizedPhone) {
-      setError("ദയവായി സാധുവായ ഫോൺ നമ്പർ നൽകുക.");
+      setError(
+        "ദയവായി സാധുവായ ഫോൺ നമ്പർ നൽകുക."
+      );
       return;
     }
 
@@ -52,20 +54,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: normalizedPhone,
-          password,
-        }),
-      });
+      const response = await fetch(
+        "/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: normalizedPhone,
+            password,
+          }),
+        }
+      );
 
-      /*
-       * Handle unexpected/non-JSON responses safely.
-       */
       let data: {
         message?: string;
       } = {};
@@ -87,10 +89,18 @@ export default function LoginPage() {
       /*
        * Login successful.
        *
-       * The server should already have created
-       * the secure session cookie.
+       * The server has created the session cookie.
+       *
+       * Go back to the page the user originally
+       * wanted to access.
+       *
+       * For the magazine this will be:
+       * /magazine/latest
+       *
+       * That page will then check whether the user
+       * has already paid.
        */
-      router.push("/magazine/latest");
+      router.push(redirectUrl);
       router.refresh();
     } catch {
       setError(
@@ -163,7 +173,8 @@ export default function LoginPage() {
               />
 
               <p className="mt-1.5 text-xs text-[#20150A]/50">
-                ഉദാ: 9876543210 അല്ലെങ്കിൽ +919876543210
+                ഉദാ: 9876543210 അല്ലെങ്കിൽ
+                +919876543210
               </p>
             </div>
 
@@ -257,7 +268,9 @@ export default function LoginPage() {
             </p>
 
             <Link
-              href="/register"
+              href={`/register?redirect=${encodeURIComponent(
+                redirectUrl
+              )}`}
               className="mt-1 inline-block text-sm font-semibold text-[#D11001] hover:underline"
             >
               പുതിയ അക്കൗണ്ട് സൃഷ്ടിക്കുക

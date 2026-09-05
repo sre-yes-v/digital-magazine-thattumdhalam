@@ -2,36 +2,49 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+
 import { normalizeIndianPhone } from "@/lib/phone";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const redirectUrl =
+    searchParams.get("redirect") || "/";
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
+  const [
+    showConfirmPassword,
+    setShowConfirmPassword,
+  ] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   function handlePhoneChange(value: string) {
-    // Allow the user to type naturally.
-    // Normalize what is displayed.
-    const normalized = normalizeIndianPhone(value);
+    const normalized =
+      normalizeIndianPhone(value);
 
     if (normalized) {
       setPhone(normalized);
       return;
     }
 
-    // While the user is still typing, keep only
-    // characters that make sense for a phone number.
-    const cleaned = value.replace(/[^\d+ ]/g, "");
+    const cleaned = value.replace(
+      /[^\d+ ]/g,
+      ""
+    );
 
     setPhone(cleaned);
   }
@@ -43,10 +56,13 @@ export default function RegisterPage() {
 
     setError("");
 
-    const normalizedPhone = normalizeIndianPhone(phone);
+    const normalizedPhone =
+      normalizeIndianPhone(phone);
 
     if (!normalizedPhone) {
-      setError("ദയവായി സാധുവായ ഫോൺ നമ്പർ നൽകുക.");
+      setError(
+        "ദയവായി സാധുവായ ഫോൺ നമ്പർ നൽകുക."
+      );
       return;
     }
 
@@ -58,7 +74,9 @@ export default function RegisterPage() {
     }
 
     if (password.length > 128) {
-      setError("പാസ്‌വേഡ് വളരെ നീളമുള്ളതാണ്.");
+      setError(
+        "പാസ്‌വേഡ് വളരെ നീളമുള്ളതാണ്."
+      );
       return;
     }
 
@@ -72,18 +90,29 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: normalizedPhone,
-          password,
-        }),
-      });
+      const response = await fetch(
+        "/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: normalizedPhone,
+            password,
+          }),
+        }
+      );
 
-      const data = await response.json();
+      let data: {
+        message?: string;
+      } = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (!response.ok) {
         setError(
@@ -93,7 +122,28 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push("/login?registered=true");
+      /*
+       * Registration successful.
+       *
+       * IMPORTANT:
+       * /api/auth/register must create the session
+       * cookie before returning success.
+       *
+       * Then send the user back to the original
+       * destination.
+       *
+       * For a magazine purchase:
+       *
+       * /magazine/latest
+       *       ↓
+       * session exists
+       *       ↓
+       * user hasn't paid
+       *       ↓
+       * MagazinePayment
+       */
+      router.push(redirectUrl);
+      router.refresh();
     } catch {
       setError(
         "സെർവറുമായി ബന്ധപ്പെടാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക."
@@ -109,7 +159,10 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="mb-10 text-center">
-          <Link href="/" className="inline-block">
+          <Link
+            href="/"
+            className="inline-block"
+          >
             <img
               src="/images/logo.jpeg"
               alt="തട്ടുംദളം"
@@ -128,6 +181,7 @@ export default function RegisterPage() {
 
         {/* Form Card */}
         <div className="rounded-2xl border border-[#661B0B]/10 bg-white p-6 shadow-sm sm:p-8">
+
           <form
             onSubmit={handleRegister}
             className="space-y-5"
@@ -150,11 +204,14 @@ export default function RegisterPage() {
                 placeholder="+91 9876543210"
                 value={phone}
                 onChange={(e) =>
-                  handlePhoneChange(e.target.value)
+                  handlePhoneChange(
+                    e.target.value
+                  )
                 }
                 required
                 maxLength={15}
-                className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
+                disabled={loading}
+                className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <p className="mt-1.5 text-xs text-[#20150A]/50">
@@ -188,20 +245,24 @@ export default function RegisterPage() {
                   required
                   minLength={8}
                   maxLength={128}
-                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
+                  disabled={loading}
+                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10 disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
                 <button
                   type="button"
                   onClick={() =>
-                    setShowPassword((prev) => !prev)
+                    setShowPassword(
+                      (prev) => !prev
+                    )
                   }
                   aria-label={
                     showPassword
                       ? "Hide password"
                       : "Show password"
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001]"
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {showPassword ? (
                     <EyeOff
@@ -246,7 +307,8 @@ export default function RegisterPage() {
                   required
                   minLength={8}
                   maxLength={128}
-                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10"
+                  disabled={loading}
+                  className="w-full rounded-xl border border-[#661B0B]/20 bg-[#F6F5F4] px-4 py-3 pr-12 text-sm outline-none transition focus:border-[#D11001] focus:ring-2 focus:ring-[#D11001]/10 disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
                 <button
@@ -261,7 +323,8 @@ export default function RegisterPage() {
                       ? "Hide password"
                       : "Show password"
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001]"
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#661B0B]/60 transition hover:text-[#D11001] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {showConfirmPassword ? (
                     <EyeOff
@@ -282,13 +345,14 @@ export default function RegisterPage() {
             {error && (
               <div
                 role="alert"
+                aria-live="polite"
                 className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
               >
                 {error}
               </div>
             )}
 
-            {/* Register Button */}
+            {/* Register */}
             <button
               type="submit"
               disabled={loading}
@@ -307,7 +371,9 @@ export default function RegisterPage() {
             </p>
 
             <Link
-              href="/login"
+              href={`/login?redirect=${encodeURIComponent(
+                redirectUrl
+              )}`}
               className="mt-1 inline-block text-sm font-semibold text-[#D11001] hover:underline"
             >
               ലോഗിൻ ചെയ്യുക
