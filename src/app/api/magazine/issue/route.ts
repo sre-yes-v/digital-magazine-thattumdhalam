@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       id: id || "current",
       title: "തട്ടുംദളം മാഗസിൻ",
       subtitle: "Digital Edition",
-      totalPages: 287, // Updated to match your total number of pages
+      totalPages: 310, // Updated to match your total number of pages
     });
   } catch (err) {
     console.error("Issue fetch error:", err);

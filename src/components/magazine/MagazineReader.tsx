@@ -60,7 +60,7 @@ export default function MagazineReader() {
         setMagazineMeta({
           title: data.title || "തട്ടുംദളം മാഗസിൻ",
           subtitle: data.subtitle || "Digital Edition",
-          totalPages: data.totalPages || 287,
+          totalPages: data.totalPages || 310,
         });
       } catch (err) {
         console.error("Initialization error:", err);

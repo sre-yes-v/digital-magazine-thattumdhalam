@@ -1,6 +1,8 @@
+
+
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import {
@@ -10,7 +12,7 @@ import {
 
 import { normalizeIndianPhone } from "@/lib/phone";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -111,8 +113,9 @@ export default function LoginPage() {
     }
   }
 
+
   return (
-    <main className="min-h-screen bg-[#F6F5F4] text-[#20150A]">
+      <main className="min-h-screen bg-[#F6F5F4] text-[#20150A]">
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-12">
 
         {/* Logo */}
@@ -287,5 +290,14 @@ export default function LoginPage() {
         </Link>
       </div>
     </main>
+    );
+}
+
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

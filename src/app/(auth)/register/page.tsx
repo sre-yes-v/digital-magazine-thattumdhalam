@@ -1,6 +1,7 @@
+
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
 import {
   useRouter,
@@ -10,7 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { normalizeIndianPhone } from "@/lib/phone";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -390,5 +391,13 @@ export default function RegisterPage() {
         </Link>
       </div>
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }
